@@ -66,5 +66,5 @@ def plot_df(name):
 # test for individual items: passed
 #update_dataframe('thermite')
 
-# test for indiviual items: passed
+# test for individual items: passed
 #plot_df('thermite')
