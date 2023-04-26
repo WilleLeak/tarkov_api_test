@@ -64,12 +64,12 @@ def find_craft(crafted_item):
         if isinstance(cost, int):
             total_cost += cost
             
-    #current_date = datetime.date.today()
+    current_date = datetime.now().strftime('%Y-%m-%d')
     
     cost_dict['Price (RUB)'] = total_cost
     cost_dict['Items crafted'] = reward_count
     cost_dict['Price per item'] = round((total_cost / reward_count), 2)
-    #cost_dict['Date'] = current_date
+    cost_dict['Date'] = current_date
     print(f'The current cost of the {crafted_item} craft is: {total_cost} RUB')
     
     # converting file to json and saving file locally
