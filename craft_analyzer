@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime
+import os
 
 dir_path = r'C:\Users\farns\python_practice\python_stuff\tarkov_api_test'
 
@@ -32,7 +33,7 @@ def craft_query():
         """ 
     
 def find_craft(crafted_item):
-    cost_dict = {'Crafted item': crafted_item} 
+    cost_dict = {'Crafted item': crafted_item, 'Required items': {}} 
     reward_count = 0
 
     response = requests.post('https://api.tarkov.dev/graphql', json={'query': craft_query()})
@@ -56,13 +57,16 @@ def find_craft(crafted_item):
                                 cheapest_cost = vendor['priceRUB']
                                 cheapest_cost *= required_items['count']
                         cost = cheapest_cost
-                    cost_dict[name] = cost
+                    cost_dict['Required items'][name] = cost
 
 
     total_cost = 0
-    for cost in cost_dict.values():
-        if isinstance(cost, int):
-            total_cost += cost
+    # for cost in cost_dict.values():
+    #     if isinstance(cost, int):
+    #         total_cost += cost
+            
+    for name, cost in cost_dict['Required items'].items():
+        total_cost += cost
             
     current_date = datetime.now().strftime('%Y-%m-%d')
     
@@ -70,15 +74,29 @@ def find_craft(crafted_item):
     cost_dict['Items crafted'] = reward_count
     cost_dict['Price per item'] = round((total_cost / reward_count), 2)
     cost_dict['Date'] = current_date
-    print(f'The current cost of the {crafted_item} craft is: {total_cost} RUB')
+    #print(f'The current cost of the {crafted_item} craft is: {total_cost} RUB')
     
-    # converting file to json and saving file locally
     return cost_dict
 
 # TODO: write this method, it saves the craft as a .json or creates a new .json in 
 #       location dir_path
 def save_craft_json(crafted_item):
     file_name = crafted_item + '_craft_data.json'
+    file_path = dir_path + '\\' + file_name
+    cost_dict = find_craft(crafted_item)
+    
+    
+    if os.path.isfile(file_path):
+        print('file found')
+        with open(file_path, 'a') as file:
+            json.dump(cost_dict, file, indent=4)
+            file.write('\n')
+    else:
+        print('file not found: created new file')
+        with open(file_path, 'w') as file:
+            json.dump(cost_dict, file, indent=4)
+            file.write('\n')
+    
     
     
             
@@ -98,4 +116,23 @@ def save_craft_json(crafted_item):
     
 
     
-print(find_craft('7.62x39mm BP gzh'))
+#print(find_craft('9x21mm BT gzh'))
+save_craft_json('7.62x39mm BP gzh')
+
+
+    # for craft in crafts:
+    #     for reward_item in craft['rewardItems']:
+    #         if reward_item['item']['name'] == crafted_item:
+    #             reward_count = reward_item['count']
+    #             for required_items in craft['requiredItems']:
+    #                 name = required_items['item']['name']
+    #                 if len(required_items['attributes']) > 0:
+    #                     cost = 0
+    #                 else:
+    #                     cheapest_cost = 1_000_000_000
+    #                     for vendor in required_items['item']['buyFor']:
+    #                         if vendor['priceRUB'] < cheapest_cost:
+    #                             cheapest_cost = vendor['priceRUB']
+    #                             cheapest_cost *= required_items['count']
+    #                     cost = cheapest_cost
+    #                 cost_dict[name] = cost
