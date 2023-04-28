@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 windows_dir_path = r'C:\python_practice\python_stuff\tarkov_api_test'
-mac_dir_path = r''
+#mac_dir_path = r''
 
 def craft_query():
     return """
@@ -88,7 +88,7 @@ def save_craft_json(crafted_item):
         print('file found')
         with open(file_path, 'a') as file:
             json.dump(cost_dict, file, indent=4)
-            file.write(',\n')
+            file.write(',\n') 
     else:
         print('file not found: created new file')
         with open(file_path, 'w') as file:
@@ -99,7 +99,7 @@ def save_craft_json(crafted_item):
 # line chart for craft cost, line chart showing cost of all required items)   
     
 def graph_costs(crafted_item):
-    file_path = dir_path + '\\' + crafted_item +  '_craft_data.json'
+    file_path = windows_dir_path + '\\' + crafted_item +  '_craft_data.json'
     with open(file_path, 'r') as file:
         craft_data = json.load(file)
     
@@ -123,7 +123,7 @@ def graph_costs(crafted_item):
     # AI-2 medkit
 
     
-#print(find_craft('9x21mm BT gzh'))
+print(find_craft('9x21mm BT gzh'))
 
 save_craft_json('7.62x39mm BP gzh')
 
