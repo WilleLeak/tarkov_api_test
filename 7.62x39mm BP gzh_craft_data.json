@@ -1,13 +1,26 @@
 {
     "Crafted item": "7.62x39mm BP gzh",
     "Required items": {
-        "Gunpowder \"Eagle\"": 150894,
-        "Gunpowder \"Kite\"": 66129,
+        "Gunpowder \"Eagle\"": 149997,
+        "Gunpowder \"Kite\"": 66939,
         "Leatherman Multitool": 0,
-        "7.62x39mm PS gzh": 42600
+        "7.62x39mm PS gzh": 17400
     },
-    "Price (RUB)": 259623,
+    "Price (RUB)": 234336,
     "Items crafted": 120,
-    "Price per item": 2163.53,
+    "Price per item": 1952.8,
     "Date": "2023-04-27"
-}
+},
+{
+    "Crafted item": "7.62x39mm BP gzh",
+    "Required items": {
+        "Gunpowder \"Eagle\"": 149997,
+        "Gunpowder \"Kite\"": 66939,
+        "Leatherman Multitool": 0,
+        "7.62x39mm PS gzh": 17400
+    },
+    "Price (RUB)": 234336,
+    "Items crafted": 120,
+    "Price per item": 1952.8,
+    "Date": "2023-04-27"
+},
