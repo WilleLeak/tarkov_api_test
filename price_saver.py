@@ -51,6 +51,16 @@ def backfill_query():
     }
     '''    
     
+def historical_price_query(id):
+    return'''
+    query{
+    historicalItemPrices(id:"%s"){
+        timestamp
+        price
+    }
+    }
+    ''' % id
+    
 def save_item_price():
     items_array = []
     
@@ -120,70 +130,141 @@ def backfill_data():
     if not os.path.exists(item_price_file):
         print('file not found')
         return
-    historical_data = []
-    response = requests.post('https://api.tarkov.dev/graphql', json={'query':backfill_query()})
-    if response.status_code != 200:
-        raise Exception('Query failed to run by returning code of {}. {}'.format(response.status_code, craft_query()))
-    else:
-        historical_data = response.json()['data']['items']
-    
+    existing_data = []
     with open(item_price_file, 'r') as file:
-        item_list = json.load(file)
-        
-        for item in item_list:
+        existing_data = json.load(file)
+        print('starting backfill')
+        for item in existing_data:
+            print('first for loop')
             item_id = item['id']
-            item_dict = item
-            item_prices = []
-            for historical_val in historical_data:
-                if historical_val['id'] == item_id:
-                    for historical_price in historical_val['historicalPrices']:
-                        time = int(historical_price['timestamp']) / 1000
-                        date = datetime.fromtimestamp(time).strftime('%Y-%m-%d')
-                        price = historical_price['price']
-                        new_price = {'date': date, 'price': price}
-                        item_prices.append(new_price)
-                        break # only want first price so break out of loop
-                    break # break out of loop once item is found
-            if new_price.get('price') is not None:
-                item_dict['prices'].append(new_price) # only add price if it is not null
-                
-        with open(item_price_file, 'w') as file:
-            json.dump(item_list, file, indent = 4)
-            
-        print('historial prices successfully added')
-                
+            response = requests.post('https://api.tarkov.dev/graphql', json={'query':historical_price_query(item_id)})
+            if response.status_code != 200:
+                raise Exception('Query failed to run by returning code of {}. {}'.format(response.status_code, historical_price_query(item_id)))
+            else:
+                item_prices = response.json()['data']['historicalItemPrices']
+
+            for time in item_prices:
+                print('second for loop')
+                timestamp = int(time['timestamp'])
+                date = datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d')
+                price = time['price']
+                new_values = {'date': date, 'price': price}
+                item['prices'].append(new_values)
+
+    with open(item_price_file, 'w') as file:
+        json.dump(existing_data, file, indent = 4)
+    print('prices successfully backfilled')    
+
 def graph_item_price(id):
     if not os.path.exists(item_price_file):
-        print('file not found')
+        print('File not found')
         return
-    
+
     with open(item_price_file, 'r') as file:
         item_list = json.load(file)
-        
-        prices = []
-        dates = []
+
+        prices = {}
         name = ''
-        
-        
+
         for item in item_list:
             item_id = item['id']
             if id == item_id:
                 name = item['name']
-                # get prices and dates from json file and append to arrays to graph later on
                 for value in item['prices']:
-                    prices.append(value['price'])
-                    dates.append(value['date'])
+                    date = value['date']
+                    price = value['price']
+                    if date in prices:
+                        prices[date].append(price)
+                    else:
+                        prices[date] = [price]
                 break
-        
-        plt.plot(dates, prices)
+
+        avg_prices = []
+        dates = []
+
+        for date, price_list in prices.items():
+            avg_price = sum(price_list) / len(price_list)
+            avg_prices.append(avg_price)
+            dates.append(date)
+
+        plt.plot(dates, avg_prices)
         plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.title(f'Price History of {name}')
-        
+        plt.ylabel('Average Price')
+        plt.title(f'Average Price History of {name}')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
         plt.show()
 
-            
-        print('prices successfully graphed')      
+        print('Prices successfully graphed')
         
-#graph_item_price('63ac5c9658d0485fc039f0b8')
+def sort_by_date():
+    if os.path.exists(item_price_file):
+        with open(item_price_file, 'r') as file:
+            item_list = json.load(file)
+            
+            for item in item_list:
+                prices = item['prices']
+                prices.sort(key=lambda x: x['date'])
+                
+            with open(item_price_file, 'w') as file:
+                json.dump(item_list, file, indent = 4)
+                
+            print('prices successfully sorted')
+            
+
+# def graph_item_price(id):
+#     if not os.path.exists(item_price_file):
+#         print('file not found')
+#         return
+    
+#     with open(item_price_file, 'r') as file:
+#         item_list = json.load(file)
+        
+#         prices = []
+#         dates = []
+#         name = ''
+#         price_by_date = {}  # Dictionary to store prices by date
+        
+#         for item in item_list:
+#             item_id = item['id']
+#             if id == item_id:
+#                 name = item['name']
+#                 # Group prices by date and calculate average
+#                 for value in item['prices']:
+#                     date = value['date']
+#                     price = value['price']
+#                     if price is not None:  # Exclude null prices
+#                         if date in price_by_date:
+#                             price_by_date[date].append(price)
+#                         else:
+#                             price_by_date[date] = [price]
+        
+#         for date, price_list in price_by_date.items():
+#             average_price = sum(price_list) / len(price_list)
+#             prices.append(average_price)
+#             dates.append(date)
+        
+#         plt.plot(dates, prices)
+#         plt.xlabel('Date')
+#         plt.ylabel('Average Price')
+#         plt.title(f'Average Price History of {name}')
+        
+#         plt.show()
+        
+#         print('Prices successfully graphed')
+
+
+# test item ids:
+# 591094e086f7747caa7bb2ef -> body armor repair kit
+# 5d1b33a686f7742523398398 -> canister with purified water
+# 59e0d99486f7744a32234762 -> 7.62x39mm BP gzh
+# 59e3556c86f7741776641ac2 -> ox bleach
+# 5c0d56a986f774449d5de529 -> 9x19mm RIP
+
+#save_item_price()
+#sort_by_date()
+
+#backfill_data()        
+graph_item_price('59e3556c86f7741776641ac2')
         
