@@ -126,6 +126,7 @@ def update_item_price():
     print('prices successfully updated')
     print('prices that are null have not been changed')
 
+# DO NOT RUN AGAIN - DATA HAS BEEN BACKFILLED ALREADY
 def backfill_data():
     if not os.path.exists(item_price_file):
         print('file not found')
@@ -211,48 +212,6 @@ def sort_by_date():
                 json.dump(item_list, file, indent = 4)
                 
             print('prices successfully sorted')
-            
-
-# def graph_item_price(id):
-#     if not os.path.exists(item_price_file):
-#         print('file not found')
-#         return
-    
-#     with open(item_price_file, 'r') as file:
-#         item_list = json.load(file)
-        
-#         prices = []
-#         dates = []
-#         name = ''
-#         price_by_date = {}  # Dictionary to store prices by date
-        
-#         for item in item_list:
-#             item_id = item['id']
-#             if id == item_id:
-#                 name = item['name']
-#                 # Group prices by date and calculate average
-#                 for value in item['prices']:
-#                     date = value['date']
-#                     price = value['price']
-#                     if price is not None:  # Exclude null prices
-#                         if date in price_by_date:
-#                             price_by_date[date].append(price)
-#                         else:
-#                             price_by_date[date] = [price]
-        
-#         for date, price_list in price_by_date.items():
-#             average_price = sum(price_list) / len(price_list)
-#             prices.append(average_price)
-#             dates.append(date)
-        
-#         plt.plot(dates, prices)
-#         plt.xlabel('Date')
-#         plt.ylabel('Average Price')
-#         plt.title(f'Average Price History of {name}')
-        
-#         plt.show()
-        
-#         print('Prices successfully graphed')
 
 
 # test item ids:
@@ -264,7 +223,6 @@ def sort_by_date():
 
 #save_item_price()
 #sort_by_date()
-
-#backfill_data()        
-graph_item_price('59e3556c86f7741776641ac2')
+#backfill_data() # DO NOT RUN AGAIN      
+#graph_item_price('5447a9cd4bdc2dbd208b4567')
         
