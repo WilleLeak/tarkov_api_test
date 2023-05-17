@@ -123,6 +123,7 @@ def calculate_craft_cost(item_id, include_tools = False):
                       f'Profit per hour: {profit_per_hour}'
         return return_vals
 
+# NOT FINISHED
 def graph_total_craft_cost(item_id, include_tools = False):
     if not os.path.exists(craft_file):
         print('file not found: doing nothing')
@@ -137,5 +138,5 @@ def graph_total_craft_cost(item_id, include_tools = False):
     
 #print(query_item_by_id('590c678286f77426c9660122'))
 #print(calculate_craft_cost('5d1b33a686f7742523398398', False))
-graph_total_craft_cost('59e0d99486f7744a32234762', False)
+#graph_total_craft_cost('59e0d99486f7744a32234762', False)
 #create_or_update_craft_file()
